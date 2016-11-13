@@ -1,0 +1,156 @@
+<!doctype html>
+<html class="no-js" lang="fr-FR" ng-app="stockCutting">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+  <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="styles/lib.min.css">
+  <link rel="stylesheet" href="styles/styles.min.css">
+    
+  <!-- inject -->
+</head>
+<body>
+  <!--[if lt IE 8]>
+  <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+    <div ng-controller="1DCtrl" layout="row">
+      <div class="printRemove">
+        <md-sidenav class="md-sidenav-left" md-component-id="left" md-is-locked-open="$mdMedia('gt-xs')" md-whiteframe="4">
+          <md-toolbar layout="row">
+            <h1 class="md-toolbar-tools">{{'TITLE' | translate}}</h1>
+            <md-button class="md-small" aria-label="{{'TITLE_UPLOAD_ARIA' | translate}}" ngf-select="uploadProject($file);" accept="application/json" ngf-max-height="1000" ngf-max-size="1MB">
+              <md-tooltip md-direction="down">
+                {{'TITLE_UPLOAD_ARIA' | translate}}
+              </md-tooltip>
+              <md-icon md-font-set="material-icons">file_upload</md-icon>
+            </md-button>
+            <md-button type="file" accept="text/json" class="md-small" aria-label="{{'TITLE_DOWNLOAD_ARIA' | translate}}" ng-click="downloadProject();">
+              <md-tooltip md-direction="down">
+                {{'TITLE_DOWNLOAD_ARIA' | translate}}
+              </md-tooltip>
+              <md-icon md-font-set="material-icons">save</md-icon>
+            </md-button>
+          </md-toolbar>
+
+          <a id="downloadAnchorElem" style="display:none"></a>
+          <md-content layout-padding>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>{{'FORM_NAME' | translate}}</label>
+              <input ng-model="project.name" ng-change="submit()">
+            </md-input-container>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>{{'FORM_UNITS' | translate}}</label>
+              <md-select ng-model="project.units" ng-change="submit()">
+                <md-option ng-repeat="unit in units" ng-value="unit">
+                  {{unit}}
+                </md-option>
+              </md-select>
+            </md-input-container>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>{{'FORM_STOCK' | translate}}</label>
+              <input type="number" min="1" ng-model="project.stockLength" ng-change="submit()">
+            </md-input-container>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>{{'FORM_CUT' | translate}}</label>
+              <input type="number" min="0" max="{{project.stockLength}}" ng-model="project.cutSize" ng-change="submit()">
+            </md-input-container>
+            <md-input-container class="md-block" flex-gt-sm>
+              <label>{{'FORM_ALGORITHM' | translate}}</label>
+              <md-select ng-model="project.alg" ng-change="submit()">
+                <md-option ng-repeat="alg in algorithms" ng-value="$index">
+                  {{alg.name}}
+                </md-option>
+              </md-select>
+            </md-input-container>
+            <md-button class="md-raised" layout-fill aria-label="remove" ng-click="addPart();">
+              <md-icon md-font-set="material-icons">add_circle</md-icon>  {{'FORM_BUTTON_ADD' | translate}}
+            </md-button>
+            <md-list>
+              <md-list-item ng-repeat="part in project.parts">
+                <md-input-container>
+                  <label>{{'FORM_PART_LENGTH' | translate}}</label>
+                  <input type="number" min="1" max="{{project.stockLength}}" ng-model="part.size" ng-change="submit()">
+                </md-input-container>
+                <md-input-container>
+                  <label>{{'FORM_PART_QTT' | translate}}</label>
+                  <input type="number" ng-model="part.quantity" ng-change="submit()">
+                </md-input-container>
+                <md-button class="md-raised md-small md-warn" aria-label="{{'FORM_PART_REMOVE_ARIA' | translate}}" ng-click="removePart($index);">
+                  <md-tooltip md-direction="left">
+                    {{'FORM_PART_REMOVE_ARIA' | translate}}
+                  </md-tooltip>
+                  <md-icon md-font-set="material-icons">remove_circle</md-icon>
+                </md-button>
+              </md-list-item>
+            </md-list>         
+          </md-content>
+        </md-sidenav>
+      </div>
+      <div class="printSection">
+        <md-toolbar class="md-toolbar-tools" md-colors="{background: 'default-primary-300'}">
+          <h1><b>{{project.name}}</b></h1>
+          <span flex></span>
+          <p>{{'RESULT_TITLE' | translate}}</p>
+          <span flex></span>
+          <md-button class="md-mini printRemove" aria-label="{{'RESULT_PRINT_ARIA' | translate}}" ng-click="print();">
+            <md-tooltip class="printRemove" md-direction="down">
+              {{'RESULT_PRINT_ARIA' | translate}}
+            </md-tooltip>
+            <md-icon md-font-set="material-icons" class="printRemove">print</md-icon>
+          </md-button>
+        </md-toolbar>        
+        <md-card flex>
+          <md-card-title>
+            <md-card-title-text>
+              <span class="md-headline">{{'RESULT_INVENTORY' | translate}}</span>
+            </md-card-title-text>
+          </md-card-title>
+          <md-divider></md-divider>
+          <md-card-content layout="row">
+            <div flex><p><b>{{'RESULT_STOCK_NEEDED' | translate}}</b><br/>
+            {{cutList.nbStock}} x {{cutList.stockLength}}{{project.units}} ({{cutList.totalStockLength}}{{project.units}})</p></div>
+            <div flex><p><b>{{'RESULT_TOTAL_LENGTH' | translate}}</b><br/>
+            {{cutList.totalLength}}{{project.units}}</p></div>
+            <div flex><p><b>{{'RESULT_WASTE' | translate}}</b><br/>
+            {{cutList.waste}}{{project.units}}</p></div>
+          </md-card-content>
+        </md-card>
+        <md-card id="cutlist-graphs">
+          <md-card-title>
+            <md-card-title-text>
+              <span class="md-headline">{{'RESULT_CUT_LIST' | translate}}</span>
+            </md-card-title-text>
+          </md-card-title>
+          <md-divider></md-divider>
+          <md-card-content ng-repeat="bin in cutList.bins" ng-value="$index" on-finish-render="ngRepeatFinished">
+            <p><b>{{'RESULT_STOCK_PREFIX' | translate}} #{{$index+1}}</b> - {{bin.description}}</p>
+            <div class="svgcontainer"><svg id="drawing-{{$index}}"></svg></div>
+            <md-divider ng-if="!$last"></md-divider>
+          </md-card-content>
+        </md-card>
+      </div>
+    </div>
+  
+  <script src="scripts/lib.min.js"></script>
+  <script src="scripts/svg.min.js"></script>
+  <script src="scripts/app.min.js"></script>
+
+  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+  <script>
+    window.ga=function(){ga.q.push(arguments)};ga.q=[];ga.l=+new Date;
+    ga('create','UA-XXXXX-Y','auto');ga('send','pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async defer></script>
+</body>
+</html>

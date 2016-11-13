@@ -1,0 +1,90 @@
+md-card-title {
+  padding: 18px 16px 16px !important;
+}
+
+md-card-content {
+  padding: 16px 16px 0px 16px !important;
+}
+
+.svgcontainer {
+  margin-bottom: 10px !important;
+}
+
+.md-errors-spacer {
+  min-height: 0 !important;
+}
+
+.md-button.md-small {
+  min-width: 15%;
+}
+
+.paddedContainer {
+  padding:30px;
+  padding-bottom: 0px;
+}
+
+.full-height {
+  height: 100%;
+}
+
+@media screen{
+  .printOnly{
+    display:none;
+  }
+  
+  .printSection {
+    flex:1;
+  }
+}
+
+@media print {
+
+  @page {
+    size: 210mm 297mm; /* landscape */
+    /* you can also specify margins here: */
+    margin: 15mm; /* for compatibility with both A4 and Letter */
+  }
+
+  body {
+    -webkit-print-color-adjust:exact;
+    background-color: #FFF !important;
+  }
+  md-card {
+    border: 1px solid black !important;
+    box-shadow: none !important;
+  }
+  md-button {
+    display:none !important;
+  }
+  .printSection {
+    background-color: #FFF !important;
+  }
+  .printOnly, .printOnly *{
+    visibility:visible;
+    display:initial;
+  }
+  .printOnly.printRemove{
+    display:none;
+  }
+  .printSection, .printSection * {
+    visibility:visible;
+  }
+  .printRemove, .printRemove *{
+    display:none;
+  }
+  .printHide, .printHide *{
+    visibility:hidden;
+  }
+  .printHide .printSection *{
+    visibility:visible;
+  }
+  .printRemove .printSection *{
+    visibility:visible;
+  }
+  .avoidPageBreak{
+    page-break-inside:avoid;
+  }
+  .removePrintButton{
+    display: none !important;
+  }
+}
